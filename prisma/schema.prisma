@@ -3,15 +3,111 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = "mysql://root:Root1234_@localhost:3306/OTP"
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  password String 
+model Api_calls {
+  id                       BigInt                  @id @default(autoincrement()) @db.UnsignedBigInt
+  api_key_id               BigInt                  @db.UnsignedBigInt
+  operator_otp_provider_id BigInt                  @db.UnsignedBigInt
+  call_date                DateTime                @db.DateTime(0)
+  operation_id             BigInt                  @db.UnsignedBigInt
+  phone_number             String                  @db.VarChar(255)
+  otp                      String                  @db.VarChar(255)
+  otp_validity             DateTime                @db.Date
+  cost                     Float
+  Api_keys                 Api_keys                @relation(fields: [api_key_id], references: [id], onUpdate: Restrict, map: "api_calls_api_key_id_foreign")
+  Operations               Operations              @relation(fields: [operation_id], references: [id], onUpdate: Restrict, map: "api_calls_operation_id_foreign")
+  Operators_otp_providers  Operators_otp_providers @relation(fields: [operator_otp_provider_id], references: [id], onUpdate: Restrict, map: "api_calls_operator_otp_provider_id_foreign")
+
+  @@index([api_key_id], map: "api_calls_api_key_id_foreign")
+  @@index([operation_id], map: "api_calls_operation_id_foreign")
+  @@index([operator_otp_provider_id], map: "api_calls_operator_otp_provider_id_foreign")
 }
 
+model Api_keys {
+  id            BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  Key           String      @db.VarChar(255)
+  app_id        BigInt      @db.UnsignedBigInt
+  valide_untill DateTime    @db.Date
+  Api_calls     Api_calls[]
+  Apps          Apps        @relation(fields: [app_id], references: [id], onUpdate: Restrict, map: "api_keys_app_id_foreign")
 
+  @@index([app_id], map: "api_keys_app_id_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Apps {
+  id          BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String     @db.VarChar(255)
+  Access_type Int        @db.SmallInt
+  customer_id BigInt     @db.UnsignedBigInt
+  Api_keys    Api_keys[]
+  Customers   Customers  @relation(fields: [customer_id], references: [id], onUpdate: Restrict, map: "apps_customer_id_foreign")
+
+  @@index([customer_id], map: "apps_customer_id_foreign")
+}
+
+model Customers {
+  id                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  name               String               @db.VarChar(255)
+  email              String               @db.VarChar(255)
+  password           String               @db.VarChar(255)
+  company_name       String               @db.VarChar(255)
+  rc                 String?              @db.VarChar(255)
+  nif                String?              @db.VarChar(255)
+  balance            Float                @default(0)
+  Apps               Apps[]
+  Funding_Operations Funding_Operations[]
+}
+
+model Funding_Operations {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  amount      String    @db.VarChar(255)
+  currency    String    @db.VarChar(255)
+  customer_id BigInt    @db.UnsignedBigInt
+  Customers   Customers @relation(fields: [customer_id], references: [id], onUpdate: Restrict, map: "funding_operations_customer_id_foreign")
+
+  @@index([customer_id], map: "funding_operations_customer_id_foreign")
+}
+
+model OTP_Provider {
+  id                      BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  Name                    String                    @db.VarChar(255)
+  ApiKey                  String                    @db.VarChar(255)
+  base_url                String                    @db.VarChar(255)
+  Operations              Operations[]
+  Operators_otp_providers Operators_otp_providers[]
+}
+
+model Operations {
+  id              BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  name            String       @db.VarChar(255)
+  url             BigInt
+  args            String       @db.LongText
+  otp_provider_id BigInt       @db.UnsignedBigInt
+  Api_calls       Api_calls[]
+  OTP_Provider    OTP_Provider @relation(fields: [otp_provider_id], references: [id], onUpdate: Restrict, map: "operations_otp_provider_id_foreign")
+
+  @@index([otp_provider_id], map: "operations_otp_provider_id_foreign")
+}
+
+model Operators {
+  id                      BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  name                    String                    @db.VarChar(255)
+  Operators_otp_providers Operators_otp_providers[]
+}
+
+model Operators_otp_providers {
+  id              BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  operator_id     BigInt       @db.UnsignedBigInt
+  otp_provider_id BigInt       @db.UnsignedBigInt
+  base_price      Float
+  Api_calls       Api_calls[]
+  Operators       Operators    @relation(fields: [operator_id], references: [id], onUpdate: Restrict, map: "operators_otp_providers_operator_id_foreign")
+  OTP_Provider    OTP_Provider @relation(fields: [otp_provider_id], references: [id], onUpdate: Restrict, map: "operators_otp_providers_otp_provider_id_foreign")
+
+  @@index([operator_id], map: "operators_otp_providers_operator_id_foreign")
+  @@index([otp_provider_id], map: "operators_otp_providers_otp_provider_id_foreign")
+}
