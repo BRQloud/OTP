@@ -84,8 +84,8 @@ model OTP_Provider {
 model Operations {
   id              BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
   name            String       @db.VarChar(255)
-  url             BigInt
-  args            String       @db.LongText
+  url             String       @db.VarChar(255)
+  args            String       @db.Text
   otp_provider_id BigInt       @db.UnsignedBigInt
   Api_calls       Api_calls[]
   OTP_Provider    OTP_Provider @relation(fields: [otp_provider_id], references: [id], onUpdate: Restrict, map: "operations_otp_provider_id_foreign")
