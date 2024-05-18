@@ -15,7 +15,7 @@ model Api_calls {
   operation_id             BigInt                  @db.UnsignedBigInt
   phone_number             String                  @db.VarChar(255)
   otp                      String                  @db.VarChar(255)
-  otp_validity             DateTime                @db.Date
+  otp_validity             DateTime                @db.DateTime
   cost                     Float
   Api_keys                 Api_keys                @relation(fields: [api_key_id], references: [id], onUpdate: Restrict, map: "api_calls_api_key_id_foreign")
   Operations               Operations              @relation(fields: [operation_id], references: [id], onUpdate: Restrict, map: "api_calls_operation_id_foreign")
