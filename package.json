@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "build": "npx tsc"
+
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
@@ -28,4 +30,5 @@
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   }
+ 
 }

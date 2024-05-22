@@ -11,6 +11,11 @@ app.use(express.json())
 
 export interface sendOtp { phoneNumber: string, apiKey: string }
 
+app.get('/',async (req, res) => {
+  res.json({ "success": true, "message": "tested successfully" })
+
+})
+
 app.post(`/api/signup`, async (req, res) => {
 
 
