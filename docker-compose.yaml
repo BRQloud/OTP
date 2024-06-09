@@ -8,7 +8,7 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "3005:3000"
     environment:
       - DATABASE_URL=mysql://root:Root1234_@localhost:3001/OTP
     depends_on:
