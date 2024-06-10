@@ -12,8 +12,9 @@ app.use(express.json())
 export interface sendOtp { phoneNumber: string, apiKey: string }
 
 app.get('/',async (req, res) => {
-  res.json({ "success": true, "message": "tested successfully" })
+  const user = await prisma.$queryRaw`SELECT 1`;
 
+  res.json({ "success": true, "message": user })
 })
 
 app.post(`/api/signup`, async (req, res) => {
