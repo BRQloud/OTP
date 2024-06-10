@@ -1,7 +1,6 @@
 # Use the official Node.js image as the base image
 FROM node:18.8
 
-RUN mkdir -p /app
 
 # Set the working directory
 WORKDIR /app
