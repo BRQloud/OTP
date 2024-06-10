@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:Root1234_@localhost:3001/OTP"
+  url      = "mysql://root:2EwWraCDxsSuCJfJmge2TFuRAw8l5khX367ldrWw9cyCPcQqxfzdh0b7iPxm8Ojx@64.227.40.34:5435/OTP"
 }
 
 model Api_calls {
