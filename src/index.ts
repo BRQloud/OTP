@@ -14,7 +14,7 @@ export interface sendOtp { phoneNumber: string, apiKey: string }
 app.get('/',async (req, res) => {
   const user = await prisma.$queryRaw`SELECT 1`;
 
-  res.json({ "success": true, "message": user })
+  res.json({ "success": true, "message": "true" })
 })
 
 app.post(`/api/signup`, async (req, res) => {
@@ -185,7 +185,7 @@ app.post('/api/checkOtp', ApiKeyMiddleware, async (req, res) => {
 
 });
 
-const server = app.listen(3000, () => {
+const server = app.listen(3000, '0.0.0.0', () => {
 
 
   console.log(`

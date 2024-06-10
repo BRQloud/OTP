@@ -16,6 +16,9 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Copy the .env file
+COPY .env .env
+
 #generate client prisma
 
 RUN npx prisma generate
@@ -24,14 +27,9 @@ RUN npx prisma generate
 RUN npm run build
 
 # Expose the port the app runs on
-EXPOSE 3005
+EXPOSE 3000
 
-# Set environment variables (replace these values with your actual database credentials)
-ENV MYSQL_USER=root
-ENV MYSQL_PASSWORD=2EwWraCDxsSuCJfJmge2TFuRAw8l5khX367ldrWw9cyCPcQqxfzdh0b7iPxm8Ojx
-ENV MYSQL_HOST=64.227.40.34
-ENV MYSQL_PORT=5435
-ENV MYSQL_DATABASE=OTP
+
 
 # Define the command to run the app
 CMD ["npm", "run","dev"]
