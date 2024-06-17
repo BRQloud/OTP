@@ -178,7 +178,8 @@ app.post('/api/checkOtp', ApiKeyMiddleware, async (req, res) => {
     res.json({ "success": true, "message": "OTP checked successfully" })
   } else {
 
-    res.json({ "success": false, "message": "Wrong code" })
+    res.status(401).json({ "success": false, "message": "Wrong code" });
+
 
   }
 
