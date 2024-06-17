@@ -134,7 +134,7 @@ app.post('/api/sendOtp', ApiKeyMiddleware, async (req, res) => {
         operator_otp_provider_id: perfectProvider?.id ?? 0,
         call_date: new Date(),
         operation_id: operation?.id ?? 0,
-        phone_number: phoneNumber,
+        phone_number: phoneNumber.startsWith("0") ? `213${phoneNumber}` : phoneNumber,
         otp: Math.round(code).toString(),
         otp_validity: otpExpiration,
         cost: perfectProvider?.base_price ?? 0,
@@ -154,7 +154,7 @@ app.post('/api/sendOtp', ApiKeyMiddleware, async (req, res) => {
 
 app.post('/api/checkOtp', ApiKeyMiddleware, async (req, res) => {
   const apiKey = req.headers["key"] as string
-  const { code }: { code: string } = req.body
+  const { code ,phoneNumber }: { code: string,phoneNumber:string } = req.body
 
 
   const apiCall = await prisma.api_calls.findFirst({
@@ -164,6 +164,9 @@ app.post('/api/checkOtp', ApiKeyMiddleware, async (req, res) => {
         AND: {
           otp_validity: {
             gt: new Date()
+          }, 
+          AND: {
+            phone_number:phoneNumber.startsWith("0") ? `213${phoneNumber}` : phoneNumber
           }
         },
         Api_keys: {
