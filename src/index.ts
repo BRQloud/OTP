@@ -135,7 +135,8 @@ app.post('/api/sendOtp', ApiKeyMiddleware, async (req, res) => {
         call_date: new Date(),
         operation_id: operation?.id ?? 0,
         phone_number: phoneNumber.startsWith("0") ? `213${phoneNumber}` : phoneNumber,
-        otp: Math.round(code).toString(),
+        // temporarly set it to 123456  otp: Math.round(code).toString(),
+        otp:"123456",
         otp_validity: otpExpiration,
         cost: perfectProvider?.base_price ?? 0,
 
