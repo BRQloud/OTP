@@ -9,9 +9,24 @@ const app = express()
 
 app.use(express.json())
 
+app.use((req, res, next) => {
+  const originalJson = res.json;
+
+  res.json = function (data) {
+    const jsonData = JSON.stringify(data, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    );
+    res.setHeader('Content-Type', 'application/json');
+    return originalJson.call(this, JSON.parse(jsonData));
+  };
+
+  next();
+});
+
+
 export interface sendOtp { phoneNumber: string, apiKey: string }
 
-app.get('/',async (req, res) => {
+app.get('/', async (req, res) => {
   const user = await prisma.$queryRaw`SELECT 1`;
 
   res.json({ "success": true, "message": "true" })
@@ -136,7 +151,7 @@ app.post('/api/sendOtp', ApiKeyMiddleware, async (req, res) => {
         operation_id: operation?.id ?? 0,
         phone_number: phoneNumber.startsWith("0") ? `213${phoneNumber}` : phoneNumber,
         // temporarly set it to 123456  otp: Math.round(code).toString(),
-        otp:"123456",
+        otp: "123456",
         otp_validity: otpExpiration,
         cost: perfectProvider?.base_price ?? 0,
 
@@ -155,28 +170,34 @@ app.post('/api/sendOtp', ApiKeyMiddleware, async (req, res) => {
 
 app.post('/api/checkOtp', ApiKeyMiddleware, async (req, res) => {
   const apiKey = req.headers["key"] as string
-  const { code ,phoneNumber }: { code: string,phoneNumber:string } = req.body
-
+  const { code, phoneNumber }: { code: string, phoneNumber: string } = req.body
+  const key = await prisma.api_keys.findFirst({
+    where: {
+      Key: apiKey
+    }
+  })
   const apiCall = await prisma.api_calls.findFirst({
     where: {
-      otp: code,
+      api_key_id: Number(key?.id.toString()),
       AND: {
+
+        otp: code,
         AND: {
           otp_validity: {
             gt: new Date()
-          }, 
-          AND: {
-            phone_number:phoneNumber.startsWith("0") ? `213${phoneNumber}` : phoneNumber
+          },
+          AND:{
+          phone_number:phoneNumber.startsWith("0") ? `213${phoneNumber}` : phoneNumber
+
           }
-        },
-        Api_keys: {
-          Key: apiKey
-        },
-      }
+        }
+      },
+
+    
     },
 
   })
-  res.json(apiCall);
+ 
   if (apiCall != null) {
 
     res.json({ "success": true, "message": "OTP checked successfully" })
