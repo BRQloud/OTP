@@ -156,7 +156,7 @@ app.post('/api/sendOtp', ApiKeyMiddleware, async (req, res) => {
 app.post('/api/checkOtp', ApiKeyMiddleware, async (req, res) => {
   const apiKey = req.headers["key"] as string
   const { code ,phoneNumber }: { code: string,phoneNumber:string } = req.body
-
+  res.json({code,phoneNumber});
 
   const apiCall = await prisma.api_calls.findFirst({
     where: {
