@@ -3,9 +3,11 @@ import express from 'express'
 import { AuthenticatedUser, CheckPassword, generateAccessToken, HashPassword, isAuthenticated } from './helpers/JwtHelper';
 import { CustomerToString } from './helpers/Serializers';
 import { ApiKeyMiddleware, AuthMiddleware } from './middleware/AuthMiddleware';
+import morgan from 'morgan';
 
 export const prisma = new PrismaClient()
 const app = express()
+app.use(morgan('dev'));
 
 app.use(express.json())
 
